@@ -35,10 +35,10 @@ class TransferMVGD(MatcherBaseclass):
         self._fun_dict = {'mvgd': self.analytical_solver, 'mkl': self.mkl_solver}
         try:
             self._fun_name = [kw for kw in list(self._fun_dict.keys()) if kwargs['method'].__contains__(kw)][0]
-        except (BaseException, IndexError):
+        except BaseException:
             # default function
             self._fun_name = 'mkl'
-        self._fun_call = self._fun_dict[self._fun_name] if self._fun_name in self._fun_dict else self.mkl_solver
+        self._fun_call = self._fun_dict.get(self._fun_name, self.mkl_solver)
 
         # initialize variables
         self.r, self.z, self.cov_r, self.cov_z, self.mu_r, self.mu_z, self.transfer_mat = [None]*7
@@ -183,4 +183,6 @@ class TransferMVGD(MatcherBaseclass):
         """
 
         if np.ndim(self.cov_r) == 0 or np.ndim(self.cov_z) == 0:
-            raise Exception('Wrong color channel dimensionality for %s method' % self._fun_name)
+            raise Exception(
+                f'Wrong color channel dimensionality for {self._fun_name} method'
+            )

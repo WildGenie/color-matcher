@@ -30,5 +30,8 @@ for frame in ImageSequence.Iterator(im):
 
     sequence.append(Image.fromarray(Normalizer(match).uint8_norm()))
 
-output_fn = os.path.join(dir_path, os.path.splitext(fn_img1)[0] + '_' + method + '.gif')
+output_fn = os.path.join(
+    dir_path, f'{os.path.splitext(fn_img1)[0]}_{method}.gif'
+)
+
 imageio.mimwrite(output_fn, sequence, duration=1/duration, palettesize=2**8)

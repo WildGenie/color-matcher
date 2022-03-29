@@ -39,12 +39,19 @@ def save_img_file(img, file_path: str = None, file_type: str = None) -> bool:
     ext = os.path.splitext(file_path)[-1][1:]
 
     if not file_type:
-        file_type = ext if ext == 'png' or ext == 'tiff' else 'tiff' if img.dtype == 'uint16' else 'png'
+        file_type = (
+            ext
+            if ext in ['png', 'tiff']
+            else 'tiff'
+            if img.dtype == 'uint16'
+            else 'png'
+        )
+
 
     # compose new file path string if extension type changed
     file_path = os.path.splitext(file_path)[-2] if file_path.endswith(FILE_EXTS) else file_path
     file_type = 'png' if file_type is None else file_type
-    file_path += '.' + file_type
+    file_path += f'.{file_type}'
 
     # normalization
     img = Normalizer(img).uint16_norm() if file_type.__contains__('tif') else Normalizer(img).uint8_norm()
@@ -55,7 +62,7 @@ def save_img_file(img, file_path: str = None, file_type: str = None) -> bool:
         imageio.imwrite(uri=file_path, im=img)
         suppress_user_warning(False, category=UserWarning)
     except ImportError:
-        if file_type == 'png' or file_type == 'bmp':
+        if file_type in ['png', 'bmp']:
             try:
                 Image.fromarray(img).save(file_path, file_type, optimize=True)
                 #imageio.imwrite(uri=file_path, im=img)
@@ -70,23 +77,22 @@ def load_img_file(file_path: str = None) -> np.ndarray:
     # get file extension
     file_type = file_path.split('.')[-1]
 
-    if any(file_type.lower() in ext for ext in FILE_EXTS):
-        try:
-            import imageio
-            suppress_user_warning(True, category=UserWarning)
-            img = imageio.imread(uri=file_path, format=file_type)
-            suppress_user_warning(False, category=UserWarning)
-        except ImportError:
-            try:
-                img = Image.open(file_path)
-            except OSError or TypeError:
-                # support load of truncated images
-                from PIL import ImageFile
-                ImageFile.LOAD_TRUNCATED_IMAGES = True
-                img = Image.open(file_path)
+    if all(file_type.lower() not in ext for ext in FILE_EXTS):
+        raise TypeError(f'Filetype {file_type} not recognized')
 
-    else:
-        raise TypeError('Filetype %s not recognized' % file_type)
+    try:
+        import imageio
+        suppress_user_warning(True, category=UserWarning)
+        img = imageio.imread(uri=file_path, format=file_type)
+        suppress_user_warning(False, category=UserWarning)
+    except ImportError:
+        try:
+            img = Image.open(file_path)
+        except OSError or TypeError:
+            # support load of truncated images
+            from PIL import ImageFile
+            ImageFile.LOAD_TRUNCATED_IMAGES = True
+            img = Image.open(file_path)
 
     # normalize (convert to numpy array)
     img = Normalizer(np.asarray(img)).type_norm()
@@ -108,7 +114,7 @@ def select_file(init_dir=None, title=''):
     """ get filepath from tkinter dialog """
 
     # consider initial directory if provided
-    init_dir = os.path.expanduser('~/') if not init_dir else init_dir
+    init_dir = init_dir or os.path.expanduser('~/')
 
     # import tkinter while considering Python version
     try:
@@ -125,4 +131,4 @@ def select_file(init_dir=None, title=''):
     file_path = askopenfilename(initialdir=[init_dir], title=title)
     root.update()
 
-    return file_path if file_path else None
+    return file_path or None
