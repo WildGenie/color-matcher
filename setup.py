@@ -52,17 +52,11 @@ if platform == 'darwin':
         data_files=FILES,
         options=dict(py2app=OPTIONS),
     )
-elif platform == 'win32':
-    extra_options = dict(
-        setup_requires=[],
-        #app=APP,
-        data_files=FILES,
-    )
 else:
-    extra_options = dict(
-        setup_requires=[],
-        data_files=FILES,
- )
+       extra_options = dict(
+           setup_requires=[],
+           data_files=FILES,
+    )
 
 # parse description section text
 readme_path = os.path.join(os.path.dirname(os.path.realpath(__file__)), 'README.rst')

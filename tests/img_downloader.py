@@ -25,9 +25,7 @@ def get_all_images(url):
     soup = bs(requests.get(url).content, "html.parser")
 
     filenames = [x.attrs.get('href') for x in soup.find_all("a") if x.attrs.get('href').__contains__('bmp')]
-    urls = [os.path.join(url, filename) for filename in filenames]
-
-    return urls
+    return [os.path.join(url, filename) for filename in filenames]
 
 
 def download_file(url, pathname):

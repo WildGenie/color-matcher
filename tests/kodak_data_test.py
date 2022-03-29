@@ -40,9 +40,7 @@ class MatchKodakTester(unittest.TestCase):
         self.dat_path = os.path.join(self.dir_path, 'data')
 
     def test_kodak_images(self):
-        # prepare data
-        url = 'https://www.math.purdue.edu/~lucier/PHOTO_CD/BMP_IMAGES/'
-        self.fnames = ['IMG' + str(i + 1).zfill(4) + '.bmp' for i in range(24)]
+        self.fnames = [f'IMG{str(i + 1).zfill(4)}.bmp' for i in range(24)]
         loc_path = os.path.join(self.dat_path, 'kodak')
 
         try:
@@ -52,6 +50,8 @@ class MatchKodakTester(unittest.TestCase):
             pass
 
         if not os.path.exists(loc_path):
+            # prepare data
+            url = 'https://www.math.purdue.edu/~lucier/PHOTO_CD/BMP_IMAGES/'
             download_stack(url, loc_path)
 
         for fn_img1 in self.fnames:
@@ -65,7 +65,7 @@ class MatchKodakTester(unittest.TestCase):
 
                 # assess quality
                 val = MatchMethodTester.avg_hist_dist(res, img2)
-                print('Avg. histogram distance %s' % val)
+                print(f'Avg. histogram distance {val}')
 
                 # save result
                 output_filename = os.path.join(loc_path, 'results', fn_img1.split('.')[0] + '_from_' + fn_img2)

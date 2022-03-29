@@ -81,7 +81,10 @@ class MatchMethodTester(unittest.TestCase):
         mu_match, cov_match = cm.mu_z, cm.cov_z
         refer_w2 = ColorMatcher.w2_dist(mu_a=mu_house, mu_b=mu_plain, cov_a=cov_house, cov_b=cov_plain)
         match_w2 = ColorMatcher.w2_dist(mu_a=mu_match, mu_b=mu_plain, cov_a=cov_match, cov_b=cov_plain)
-        print('Wasserstein-2 distance of original %s vs. %s %s' % (round(refer_w2, 3), method, round(match_w2, 3)))
+        print(
+            f'Wasserstein-2 distance of original {round(refer_w2, 3)} vs. {method} {round(match_w2, 3)}'
+        )
+
 
         # assertion
         self.assertEqual(True, refer_val > match_val)
@@ -99,8 +102,8 @@ class MatchMethodTester(unittest.TestCase):
         # get tests data from imageio lib
         fn_img1 = 'chelsea'
         fn_img2 = 'astronaut'
-        img1 = imageio.imread('imageio:'+fn_img1+'.png')
-        img2 = imageio.imread('imageio:'+fn_img2+'.png')
+        img1 = imageio.imread(f'imageio:{fn_img1}.png')
+        img2 = imageio.imread(f'imageio:{fn_img2}.png')
 
         # create color match object (without using keyword arguments)
         match = ColorMatcher(img1, img2, method=method).main()
@@ -161,9 +164,9 @@ class MatchMethodTester(unittest.TestCase):
     def test_batch_process(self):
 
         # compose CLI arguments
-        sys.argv.append('-s ' + self.dat_path)                                        # pass directory path
+        sys.argv.append(f'-s {self.dat_path}')
         sys.argv.append('-r ' + os.path.join(self.dat_path, 'scotland_plain.png'))    # pass file path
-        sys.argv.append('method==' + METHODS[0])                                      # pass method
+        sys.argv.append(f'method=={METHODS[0]}')
 
         # run CLI command
         ret = main()
